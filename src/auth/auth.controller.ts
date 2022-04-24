@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  NotFoundException,
   Post,
   UseGuards,
   UsePipes,
@@ -24,18 +25,20 @@ export class AuthController {
   @UsePipes(new ValidationPipe())
   @Post('register')
   async register(@Body() dto: CreateUserDto) {
-    const userById = await this.userService.findUserByUserId(dto.userId);
-    const user = await this.userService.findUserByEmail(dto.email);
+    console.log('finding by userId');
+    const userById = await this.userService.findUserByDisplayId(dto.displayId);
+    console.log('finding by email');
+    const userByEmail = await this.userService.findUserByEmail(dto.email);
 
-    if (user) {
+    if (userByEmail) {
       throw new BadRequestException('User with such email already exists');
     }
 
     if (userById) {
-      console.log(userById);
       throw new BadRequestException('User with such id already exists');
     }
 
+    console.log('trying to create');
     await this.userService.createUser(dto);
 
     return {
@@ -55,8 +58,19 @@ export class AuthController {
 
   @UseGuards(AuthenticatedGuard)
   @Get('check')
-  async check() {
+  async check(@Request() req: Express.Request) {
     return { loggedIn: true };
+  }
+
+  @UseGuards(AuthenticatedGuard)
+  @Get('session-info')
+  async getSessionInfo(@Request() req: Express.Request) {
+    const currentUser = await this.userService.findUserById(req.user['_id']);
+    if (!currentUser) {
+      throw new NotFoundException('User not found!');
+    }
+    console.log(currentUser);
+    return currentUser;
   }
 
   @Delete('clear')

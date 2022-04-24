@@ -1,22 +1,5 @@
 import { Type } from 'class-transformer';
-import {
-  IsArray,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-
-class CommentDto {
-  @IsString()
-  username: string;
-
-  @IsString()
-  content: string;
-
-  @IsNumber()
-  likes: number;
-}
+import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class CreatePinDto {
   @IsString()
@@ -29,6 +12,9 @@ export class CreatePinDto {
   userId: string;
 
   @IsString()
+  boardId: string;
+
+  @IsString()
   imgId: string;
 
   @IsString()
@@ -36,7 +22,6 @@ export class CreatePinDto {
 
   @IsOptional()
   @IsArray()
-  @ValidateNested()
-  @Type(() => CommentDto)
-  comments?: CommentDto[];
+  @IsString({ each: true })
+  comments?: string[];
 }

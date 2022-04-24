@@ -14,6 +14,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { path } from 'app-root-path';
 import { createReadStream } from 'fs';
+import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
 import { FilesService } from './files.service';
 
 @Controller('files')
@@ -50,7 +51,7 @@ export class FilesController {
   }
 
   @Get(':id')
-  async get(@Param('id') id: string) {
+  async get(@Param('id', MongoIdValidationPipe) id: string) {
     const fileInfo = await this.filesService.getFile(id);
     if (!fileInfo) {
       throw new NotFoundException('File does not exist');

@@ -1,19 +1,6 @@
 import { prop } from '@typegoose/typegoose';
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 
-class Comment extends TimeStamps {
-  @prop()
-  username: string;
-
-  @prop()
-  content: string;
-
-  @prop()
-  likes: number;
-
-  @prop()
-  timeStamp: Date;
-}
 export interface PinModel extends Base {}
 export class PinModel extends TimeStamps {
   @prop()
@@ -27,11 +14,11 @@ export class PinModel extends TimeStamps {
   username: string;
 
   @prop()
-  userId: string;
+  userId: string; // mongodb id
 
   @prop()
   content: string;
 
-  @prop({ type: () => [Comment] })
-  comments?: Comment[];
+  @prop()
+  comments?: string[];
 }

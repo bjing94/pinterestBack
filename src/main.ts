@@ -19,8 +19,6 @@ async function bootstrap() {
       process.env.MONGO_PORT +
       '/' +
       process.env.MONGO_AUTHDATABASE,
-    // collection: 'Sessions',
-    // expires: 60 * 60,
   });
 
   app.use(
@@ -28,7 +26,7 @@ async function bootstrap() {
       secret: process.env.SESSION_SECRET || 'mySecret',
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 360000 },
+      cookie: { maxAge: 60 * 60 * 1000 }, // 60 minutes
       store: sessionStore,
     }),
   );

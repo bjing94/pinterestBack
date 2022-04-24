@@ -37,3 +37,9 @@ lerna-debug.log*
 
 # files
 /uploads
+
+# mongo
+
+/mongo
+
+/mongo-data-4.4

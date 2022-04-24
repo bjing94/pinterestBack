@@ -7,6 +7,8 @@ import { ModelType } from '@typegoose/typegoose/lib/types';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { InjectModel } from 'nestjs-typegoose';
 import { CreateUserDto } from './dto/create-user.dto';
+import { FindUserDto } from './dto/find-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { USER_NOT_FOUND, WRONG_PASSWORD } from './user.constants';
 import { UserModel } from './user.model';
 
@@ -20,8 +22,8 @@ export class UserService {
     return this.userModel.findById(id).exec();
   }
 
-  async findUserByUserId(userId: string) {
-    return this.userModel.findOne({ userId }).exec();
+  async findUserByDisplayId(displayId: string) {
+    return this.userModel.findOne({ displayId }).exec();
   }
 
   async findUserByEmail(email: string) {
@@ -34,9 +36,11 @@ export class UserService {
     const hashedPassword = await hash(dto.password, salt);
 
     const newUser = new this.userModel({
-      userId: dto.userId,
+      username: dto.username,
+      displayId: dto.displayId,
       email: dto.email,
       passwordHash: hashedPassword,
+      avatarSrc: '6257b22712aca3a9af63cf94', //placeholder avatar
     });
     return newUser.save();
   }
@@ -59,5 +63,19 @@ export class UserService {
       throw new BadRequestException(WRONG_PASSWORD);
     }
     return foundUser;
+  }
+
+  async updateUserById(id: string, dto: UpdateUserDto) {
+    return this.userModel.findByIdAndUpdate(id, dto, { new: true }).exec();
+  }
+
+  async updateUserByDisplayId(displayId: string, dto: UpdateUserDto) {
+    return this.userModel
+      .findOneAndUpdate({ displayId }, dto, { new: true })
+      .exec();
+  }
+
+  async findUser(dto: FindUserDto) {
+    return this.userModel.find(dto).exec();
   }
 }

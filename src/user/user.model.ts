@@ -1,21 +1,22 @@
 import { prop } from '@typegoose/typegoose';
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses';
 
-class PinBoard {
-  @prop()
-  title: string;
-
-  @prop({ type: () => [String] })
-  pins: string[];
-}
-
 export interface UserModel extends Base {}
 export class UserModel extends TimeStamps {
+  @prop()
+  username: string;
+
+  @prop()
+  description: string;
+
   @prop({ unique: true })
-  userId: string;
+  displayId: string;
 
   @prop({ unique: true })
   email: string;
+
+  @prop()
+  avatarSrc: string;
 
   @prop()
   passwordHash: string;
@@ -26,6 +27,12 @@ export class UserModel extends TimeStamps {
   @prop({ type: () => [String] })
   savedPins: string[];
 
-  @prop({ type: () => [PinBoard] })
-  boards: PinBoard[];
+  @prop({ type: () => [String] })
+  boards: string[];
+
+  @prop({ type: () => [String] })
+  subscribers: string[];
+
+  @prop({ type: () => [String] })
+  subscriptions: string[];
 }
