@@ -1,39 +1,49 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class UpdateUserDto {
+  @IsOptional()
   @IsString()
-  username: string;
+  username?: string;
 
+  @IsOptional()
   @IsString()
-  description: string;
+  description?: string;
 
+  @IsOptional()
   @IsString()
-  displayId: string;
+  displayId?: string;
 
+  @IsOptional()
   @IsString()
-  email: string;
+  email?: string;
 
+  @IsOptional()
   @IsString()
-  passwordHash: string;
+  passwordHash?: string;
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  createdPins: string[];
+  createdPins?: string[];
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  savedPins: string[];
+  savedPins?: string[];
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  boards: string[];
+  boards?: string[];
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  subscribers: string[];
+  subscribers?: string[];
 
+  @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  subscriptions: string[];
+  subscriptions?: string[];
 }

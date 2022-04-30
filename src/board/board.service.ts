@@ -19,7 +19,7 @@ export class BoardService {
   }
 
   async updateBoardById(id: string, dto: Omit<CreateBoardDto, 'userId'>) {
-    return this.boardModel.findByIdAndUpdate(id, dto).exec();
+    return this.boardModel.findByIdAndUpdate(id, dto, { new: true }).exec();
   }
 
   async deleteBoardById(id: string) {

@@ -45,13 +45,8 @@ export class UserController {
   }
   @UseGuards(AuthenticatedGuard)
   @Post('subscribe/:id')
-  async subscribe(
-    @Param('id') subscriptionDisplayId: string,
-    @Req() req: Express.Request,
-  ) {
-    const subscriptionId = (
-      await this.userService.findUserByDisplayId(subscriptionDisplayId)
-    )
+  async subscribe(@Param('id') _id: string, @Req() req: Express.Request) {
+    const subscriptionId = (await this.userService.findUserById(_id))
       .toObject()
       ._id.toString();
     const subscriberId = req.user['_id'];

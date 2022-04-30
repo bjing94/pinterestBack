@@ -3,9 +3,9 @@ import { IsOptional, IsString } from 'class-validator';
 export class FindUserDto {
   @IsOptional()
   @IsString()
-  username: string;
+  username?: string;
 
   @IsOptional()
   @IsString()
-  displayId: string;
+  displayId?: string;
 }

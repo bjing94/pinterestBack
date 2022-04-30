@@ -41,6 +41,11 @@ export class UserService {
       email: dto.email,
       passwordHash: hashedPassword,
       avatarSrc: '6257b22712aca3a9af63cf94', //placeholder avatar
+      createdPins: [],
+      savedPins: [], // profile pins
+      boards: [],
+      subscribers: [],
+      subscriptions: [],
     });
     return newUser.save();
   }
@@ -66,6 +71,7 @@ export class UserService {
   }
 
   async updateUserById(id: string, dto: UpdateUserDto) {
+    console.log('Updating user', id, dto);
     return this.userModel.findByIdAndUpdate(id, dto, { new: true }).exec();
   }
 
@@ -76,6 +82,6 @@ export class UserService {
   }
 
   async findUser(dto: FindUserDto) {
-    return this.userModel.find(dto).exec();
+    return this.userModel.findOne(dto).exec();
   }
 }
