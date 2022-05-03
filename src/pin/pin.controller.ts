@@ -74,36 +74,46 @@ export class PinController {
     if (!pinData) {
       throw new NotFoundException('Board  not found!');
     }
+    // console.log(pinData.toObject().title, id);
 
     const creator = await this.userService.findUserById(
       pinData.toObject().userId,
     );
-    console.log('creator', creator.toObject().username);
 
-    const whoSaved = await this.userService.findUsersBySavedPin(id);
-    console.log(
-      'whoSaved!',
-      whoSaved.map((user) => {
-        return user.toObject().username;
-      }),
-    );
+    const newCreatedPins = creator
+      .toObject()
+      .createdPins.filter((pin) => pin !== id);
+    await this.userService.updateUserById(creator.toObject()._id.toString(), {
+      createdPins: newCreatedPins,
+    });
+    // console.log('creator', creator.toObject().username, newCreatedPins);
+    const whoSaved = await this.userService.findUsersBySavedPin(id); // delete from people who have it saved
+    // console.log(
+    //   'whoSaved!',
+    //   whoSaved.map((user) => {
+    //     return user.toObject().username;
+    //   }),
+    // );
+    const newUsers = await whoSaved.map((user) => {
+      const newSavedPins = user
+        .toObject()
+        .savedPins.filter((pin) => pin !== id);
+      // console.log(user.toObject().username, 'saved:', newSavedPins);
+      return this.userService.updateUserById(user.toObject()._id.toString(), {
+        savedPins: newSavedPins,
+      });
+    });
 
-    const boards = await this.boardService.findBoardsBySavedPin(id);
-    console.log(
-      'boards!',
-      boards.map((board) => {
-        return board.toObject().title;
-      }),
-    );
-
-    //  if (!boardOwner) {
-    //    throw new BadRequestException('Board owner not found!');
-    //  }
-
-    //  const newUser = { ...boardOwner.toObject() };
-    //  newUser.boards = newUser.boards.filter((board) => board !== id);
-    //  await this.userService.updateUserById(newUser._id.toString(), newUser);
-    //  return this.boardService.deleteBoardById(id);
+    const boards = await this.boardService.findBoardsBySavedPin(id); // delete from boards
+    const newBoards = await boards.map((board) => {
+      const newPins = board.toObject().pins.filter((pin) => pin !== id);
+      // console.log(board.toObject().title, 'pins:', newPins);
+      return this.boardService.updateBoardById(
+        board.toObject()._id.toString(),
+        { pins: newPins },
+      );
+    });
+    return this.pinService.deletePinById(id);
   }
 
   @Patch(':id')

@@ -3,6 +3,7 @@ import { ModelType } from '@typegoose/typegoose/lib/types';
 import { InjectModel } from 'nestjs-typegoose';
 import { BoardModel } from './board.model';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Injectable()
 export class BoardService {
@@ -18,7 +19,7 @@ export class BoardService {
     return this.boardModel.create(dto);
   }
 
-  async updateBoardById(id: string, dto: Omit<CreateBoardDto, 'userId'>) {
+  async updateBoardById(id: string, dto: UpdateBoardDto) {
     return this.boardModel.findByIdAndUpdate(id, dto, { new: true }).exec();
   }
 

@@ -14,6 +14,7 @@ import {
 import { UserService } from 'src/user/user.service';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
+import { UpdateBoardDto } from './dto/update-board.dto';
 
 @Controller('board')
 export class BoardController {
@@ -51,10 +52,7 @@ export class BoardController {
 
   @UsePipes(new ValidationPipe())
   @Patch(':id')
-  async update(
-    @Param('id') id: string,
-    @Body() dto: Omit<CreateBoardDto, 'userId'>,
-  ) {
+  async update(@Param('id') id: string, @Body() dto: UpdateBoardDto) {
     return this.boardService.updateBoardById(id, dto);
   }
 
