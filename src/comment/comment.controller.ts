@@ -20,7 +20,7 @@ export class CommentController {
   async get(@Param('id') id: string) {
     const comment = await this.commentService.findCommentById(id);
     if (!comment) {
-      return new NotFoundException('Comment not found.');
+      throw new NotFoundException('Comment not found.');
     }
     return comment;
   }

@@ -25,4 +25,12 @@ export class BoardService {
   async deleteBoardById(id: string) {
     return this.boardModel.findByIdAndDelete(id).exec();
   }
+
+  async findBoardById(id: string) {
+    return this.boardModel.findById(id).exec();
+  }
+
+  async findBoardsBySavedPin(pinId: string) {
+    return this.boardModel.find({ pins: { $in: [pinId] } }).exec();
+  }
 }

@@ -70,11 +70,40 @@ export class PinController {
 
   @Delete(':id')
   async delete(@Param('id', MongoIdValidationPipe) id: string) {
-    const pin = await this.pinService.deletePinById(id);
-    if (!pin) {
-      throw new NotFoundException(PIN_NOT_FOUND);
+    const pinData = await this.pinService.findPinById(id);
+    if (!pinData) {
+      throw new NotFoundException('Board  not found!');
     }
-    return pin;
+
+    const creator = await this.userService.findUserById(
+      pinData.toObject().userId,
+    );
+    console.log('creator', creator.toObject().username);
+
+    const whoSaved = await this.userService.findUsersBySavedPin(id);
+    console.log(
+      'whoSaved!',
+      whoSaved.map((user) => {
+        return user.toObject().username;
+      }),
+    );
+
+    const boards = await this.boardService.findBoardsBySavedPin(id);
+    console.log(
+      'boards!',
+      boards.map((board) => {
+        return board.toObject().title;
+      }),
+    );
+
+    //  if (!boardOwner) {
+    //    throw new BadRequestException('Board owner not found!');
+    //  }
+
+    //  const newUser = { ...boardOwner.toObject() };
+    //  newUser.boards = newUser.boards.filter((board) => board !== id);
+    //  await this.userService.updateUserById(newUser._id.toString(), newUser);
+    //  return this.boardService.deleteBoardById(id);
   }
 
   @Patch(':id')

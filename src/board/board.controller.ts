@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  NotFoundException,
   Param,
   Patch,
   Post,
@@ -23,6 +24,10 @@ export class BoardController {
 
   @Get(':id')
   async get(@Param('id') id: string) {
+    const board = await this.boardService.findBoardById(id);
+    if (!board) {
+      throw new NotFoundException('Board not found!');
+    }
     return this.boardService.getBoardById(id);
   }
 
@@ -55,6 +60,21 @@ export class BoardController {
 
   @Delete(':id')
   async delete(@Param('id') id: string) {
+    const boardData = await this.boardService.findBoardById(id);
+    if (!boardData) {
+      throw new NotFoundException('Board  not found!');
+    }
+
+    const boardOwner = await this.userService.findUserById(
+      boardData.toObject().userId,
+    );
+    if (!boardOwner) {
+      throw new BadRequestException('Board owner not found!');
+    }
+
+    const newUser = { ...boardOwner.toObject() };
+    newUser.boards = newUser.boards.filter((board) => board !== id);
+    await this.userService.updateUserById(newUser._id.toString(), newUser);
     return this.boardService.deleteBoardById(id);
   }
 }

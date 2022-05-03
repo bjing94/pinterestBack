@@ -84,4 +84,12 @@ export class UserService {
   async findUser(dto: FindUserDto) {
     return this.userModel.findOne(dto).exec();
   }
+
+  async findUsersBySavedPin(pinId: string) {
+    return this.userModel.find({ savedPins: { $in: [pinId] } }).exec();
+  }
+
+  async findUsersByCreatedPin(pinId: string) {
+    return this.userModel.find({ createdPins: { $in: [pinId] } }).exec();
+  }
 }
