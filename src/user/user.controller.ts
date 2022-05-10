@@ -22,17 +22,6 @@ import { UserService } from './user.service';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  // @Get(':id')
-  // async getUserByDisplayId(@Param('id') displayId: string) {
-  //   console.log('User id:', displayId);
-  //   const user = await this.userService.findUserByDisplayId(displayId);
-  //   if (!user) {
-  //     throw new NotFoundException('User not found!');
-  //   }
-  //   console.log(user);
-  //   return user;
-  // }
-
   @Get(':id')
   async getUserById(@Param('id') _id: string) {
     console.log('User id:', _id);
@@ -43,6 +32,7 @@ export class UserController {
     console.log(user);
     return user;
   }
+
   @UseGuards(AuthenticatedGuard)
   @Post('subscribe/:id')
   async subscribe(@Param('id') _id: string, @Req() req: Express.Request) {

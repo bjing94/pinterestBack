@@ -56,6 +56,16 @@ export class AuthController {
     };
   }
 
+  @HttpCode(200)
+  @UseGuards(AuthenticatedGuard)
+  @Post('logout')
+  async logout(@Request() req: Express.Request) {
+    req.logOut();
+    return {
+      message: 'Success',
+    };
+  }
+
   @UseGuards(AuthenticatedGuard)
   @Get('check')
   async check(@Request() req: Express.Request) {
@@ -69,7 +79,6 @@ export class AuthController {
     if (!currentUser) {
       throw new NotFoundException('User not found!');
     }
-    console.log(currentUser);
     return currentUser;
   }
 

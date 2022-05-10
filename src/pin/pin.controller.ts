@@ -9,17 +9,20 @@ import {
   Patch,
   Post,
   Query,
+  Req,
   UploadedFile,
   UseGuards,
   UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { BoardService } from 'src/board/board.service';
 import { CreateBoardDto } from 'src/board/dto/create-board.dto';
 import { FilesService } from 'src/files/files.service';
 import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { UserModel } from 'src/user/user.model';
 import { UserService } from 'src/user/user.service';
 import { PIN_NOT_FOUND } from './constants/pin.constants';
 import { CreatePinDto } from './dto/create-pin.dto';
@@ -43,6 +46,7 @@ export class PinController {
     return pin;
   }
 
+  @UseGuards(AuthenticatedGuard)
   @UsePipes(new ValidationPipe())
   @Post('create')
   async create(@Body() dto: CreatePinDto) {
@@ -68,11 +72,18 @@ export class PinController {
     return createdPin;
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Delete(':id')
-  async delete(@Param('id', MongoIdValidationPipe) id: string) {
+  async delete(
+    @Param('id', MongoIdValidationPipe) id: string,
+    @Req() req: Express.Request,
+  ) {
     const pinData = await this.pinService.findPinById(id);
     if (!pinData) {
-      throw new NotFoundException('Board  not found!');
+      throw new NotFoundException('Pin  not found!');
+    }
+    if ((req.user as UserModel)._id.toString() !== pinData.toObject().userId) {
+      throw new BadRequestException('Permission to modify pin denied!');
     }
     // console.log(pinData.toObject().title, id);
 
@@ -86,19 +97,13 @@ export class PinController {
     await this.userService.updateUserById(creator.toObject()._id.toString(), {
       createdPins: newCreatedPins,
     });
-    // console.log('creator', creator.toObject().username, newCreatedPins);
+
     const whoSaved = await this.userService.findUsersBySavedPin(id); // delete from people who have it saved
-    // console.log(
-    //   'whoSaved!',
-    //   whoSaved.map((user) => {
-    //     return user.toObject().username;
-    //   }),
-    // );
+
     const newUsers = await whoSaved.map((user) => {
       const newSavedPins = user
         .toObject()
         .savedPins.filter((pin) => pin !== id);
-      // console.log(user.toObject().username, 'saved:', newSavedPins);
       return this.userService.updateUserById(user.toObject()._id.toString(), {
         savedPins: newSavedPins,
       });
@@ -107,7 +112,6 @@ export class PinController {
     const boards = await this.boardService.findBoardsBySavedPin(id); // delete from boards
     const newBoards = await boards.map((board) => {
       const newPins = board.toObject().pins.filter((pin) => pin !== id);
-      // console.log(board.toObject().title, 'pins:', newPins);
       return this.boardService.updateBoardById(
         board.toObject()._id.toString(),
         { pins: newPins },
@@ -116,6 +120,7 @@ export class PinController {
     return this.pinService.deletePinById(id);
   }
 
+  @UseGuards(AuthenticatedGuard)
   @Patch(':id')
   async patch(
     @Param('id', MongoIdValidationPipe) id: string,

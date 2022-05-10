@@ -20,7 +20,7 @@ export class UpdateUserDto {
 
   @IsOptional()
   @IsString()
-  passwordHash?: string;
+  newPassword?: string;
 
   @IsOptional()
   @IsArray()

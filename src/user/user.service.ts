@@ -71,8 +71,17 @@ export class UserService {
   }
 
   async updateUserById(id: string, dto: UpdateUserDto) {
-    console.log('Updating user', id, dto);
-    return this.userModel.findByIdAndUpdate(id, dto, { new: true }).exec();
+    const salt = await genSalt(7);
+    const hashedPassword = await hash(dto.newPassword, salt);
+    const { newPassword, ...rest } = dto;
+
+    return this.userModel
+      .findByIdAndUpdate(
+        id,
+        { ...rest, passwordHash: hashedPassword },
+        { new: true },
+      )
+      .exec();
   }
 
   async updateUserByDisplayId(displayId: string, dto: UpdateUserDto) {
