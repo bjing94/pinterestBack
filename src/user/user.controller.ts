@@ -16,6 +16,12 @@ import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
 import { FindUserDto } from './dto/find-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  USER_CANNOT_SUBSCRIBE,
+  USER_NOT_FOUND,
+  USER_SUBSCRIBER_NOT_FOUND,
+  USER_SUBSCRIBTION_NOT_FOUND,
+} from './user.constants';
 import { UserService } from './user.service';
 
 @Controller('user')
@@ -27,7 +33,7 @@ export class UserController {
     console.log('User id:', _id);
     const user = await this.userService.findUserById(_id);
     if (!user) {
-      throw new NotFoundException('User not found!');
+      throw new NotFoundException(USER_NOT_FOUND);
     }
     console.log(user);
     return user;
@@ -42,15 +48,15 @@ export class UserController {
     const subscriberId = req.user['_id'];
 
     if (subscriberId == subscriptionId) {
-      throw new BadRequestException('Cannot subscribe to yourself!');
+      throw new BadRequestException(USER_CANNOT_SUBSCRIBE);
     }
     const subscriber = await this.userService.findUserById(subscriberId);
     if (!subscriber) {
-      throw new NotFoundException('Subscriber not found!');
+      throw new NotFoundException(USER_SUBSCRIBER_NOT_FOUND);
     }
     const subscription = await this.userService.findUserById(subscriptionId);
     if (!subscription) {
-      throw new NotFoundException('Subscription not found!');
+      throw new NotFoundException(USER_SUBSCRIBTION_NOT_FOUND);
     }
     const subscriberObj = subscriber.toObject();
     subscriberObj.subscriptions.push(subscriptionId);

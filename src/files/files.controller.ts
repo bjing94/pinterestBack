@@ -15,6 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { path } from 'app-root-path';
 import { createReadStream } from 'fs';
 import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
+import { FILE_NOT_DEFINED, FILE_NOT_FOUND } from './files.constants';
 import { FilesService } from './files.service';
 
 @Controller('files')
@@ -29,7 +30,7 @@ export class FilesController {
     @Body() additionaInfo,
   ) {
     if (!file) {
-      throw new BadRequestException('File should be defined!');
+      throw new BadRequestException(FILE_NOT_DEFINED);
     }
     return this.filesService.saveFile(file);
   }
@@ -38,7 +39,7 @@ export class FilesController {
   async download(@Param('id') id: string, @Response() res) {
     const fileInfo = await this.filesService.getFile(id);
     if (!fileInfo) {
-      throw new NotFoundException('File does not exist');
+      throw new NotFoundException(FILE_NOT_FOUND);
     }
 
     const fileStream = createReadStream(`${path}/uploads/${fileInfo.url}`);
@@ -54,7 +55,7 @@ export class FilesController {
   async get(@Param('id', MongoIdValidationPipe) id: string) {
     const fileInfo = await this.filesService.getFile(id);
     if (!fileInfo) {
-      throw new NotFoundException('File does not exist');
+      throw new NotFoundException(FILE_NOT_FOUND);
     }
 
     return fileInfo;

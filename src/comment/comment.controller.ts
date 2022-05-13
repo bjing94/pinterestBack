@@ -8,6 +8,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
+import { COMMENT_NOT_FOUND } from './comment.constants';
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
@@ -20,7 +21,7 @@ export class CommentController {
   async get(@Param('id') id: string) {
     const comment = await this.commentService.findCommentById(id);
     if (!comment) {
-      throw new NotFoundException('Comment not found.');
+      throw new NotFoundException(COMMENT_NOT_FOUND);
     }
     return comment;
   }

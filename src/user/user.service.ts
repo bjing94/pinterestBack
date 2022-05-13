@@ -9,7 +9,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindUserDto } from './dto/find-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { USER_NOT_FOUND, WRONG_PASSWORD } from './user.constants';
+import { USER_NOT_FOUND, USER_WRONG_PASSWORD } from './user.constants';
 import { UserModel } from './user.model';
 
 @Injectable()
@@ -65,7 +65,7 @@ export class UserService {
     }
     const areEqual = await compare(password, foundUser.passwordHash);
     if (!areEqual) {
-      throw new BadRequestException(WRONG_PASSWORD);
+      throw new BadRequestException(USER_WRONG_PASSWORD);
     }
     return foundUser;
   }

@@ -9,8 +9,10 @@ import {
   Query,
 } from '@nestjs/common';
 import { PIN_NOT_FOUND } from 'src/pin/constants/pin.constants';
+import { FindPinDto } from 'src/pin/dto/find-pin.dto';
 import { PinService } from 'src/pin/pin.service';
 import { FindUserDto } from 'src/user/dto/find-user.dto';
+import { USER_NOT_FOUND } from 'src/user/user.constants';
 import { UserService } from 'src/user/user.service';
 
 @Controller('search')
@@ -29,11 +31,7 @@ export class SearchController {
       title: queryStr,
       random: isRandom,
     });
-    const allPins = await this.pinService.findPin({
-      title: 'test',
-      random: true,
-    });
-    console.log(allPins);
+
     if (!pins.length) {
       throw new NotFoundException(PIN_NOT_FOUND);
     }
@@ -45,7 +43,7 @@ export class SearchController {
   async post(@Body() dto: FindUserDto) {
     const user = await this.userService.findUser(dto);
     if (!user) {
-      throw new NotFoundException('User not found.');
+      throw new NotFoundException(USER_NOT_FOUND);
     }
     return user;
   }

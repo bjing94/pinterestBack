@@ -17,14 +17,21 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
+import { BOARD_NOT_FOUND } from 'src/board/board.constants';
 import { BoardService } from 'src/board/board.service';
 import { CreateBoardDto } from 'src/board/dto/create-board.dto';
 import { FilesService } from 'src/files/files.service';
 import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
+import { USER_NOT_FOUND } from 'src/user/user.constants';
 import { UserModel } from 'src/user/user.model';
 import { UserService } from 'src/user/user.service';
-import { PIN_NOT_FOUND } from './constants/pin.constants';
+import {
+  PIN_LIMIT,
+  PIN_LIMIT_EXCEED,
+  PIN_NOT_FOUND,
+  PIN_PERMISSION_DENIED,
+} from './constants/pin.constants';
 import { CreatePinDto } from './dto/create-pin.dto';
 import { FindPinDto } from './dto/find-pin.dto';
 import { PinService } from './pin.service';
@@ -52,12 +59,16 @@ export class PinController {
   async create(@Body() dto: CreatePinDto) {
     const user = await this.userService.findUserById(dto.userId);
     if (!user) {
-      throw new BadRequestException('No such user!');
+      throw new BadRequestException(USER_NOT_FOUND);
+    }
+
+    if (user.toObject().createdPins.length >= PIN_LIMIT) {
+      throw new BadRequestException(PIN_LIMIT_EXCEED);
     }
 
     const board = await this.boardService.getBoardById(dto.boardId);
     if (!board) {
-      throw new BadRequestException('No such board!');
+      throw new BadRequestException(BOARD_NOT_FOUND);
     }
     const createdPin = await this.pinService.createPin(dto);
 
@@ -80,10 +91,10 @@ export class PinController {
   ) {
     const pinData = await this.pinService.findPinById(id);
     if (!pinData) {
-      throw new NotFoundException('Pin  not found!');
+      throw new NotFoundException(PIN_NOT_FOUND);
     }
     if ((req.user as UserModel)._id.toString() !== pinData.toObject().userId) {
-      throw new BadRequestException('Permission to modify pin denied!');
+      throw new BadRequestException(PIN_PERMISSION_DENIED);
     }
     // console.log(pinData.toObject().title, id);
 

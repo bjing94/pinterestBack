@@ -11,7 +11,9 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { USER_NOT_FOUND } from 'src/user/user.constants';
 import { UserService } from 'src/user/user.service';
+import { BOARD_NOT_FOUND } from './board.constants';
 import { BoardService } from './board.service';
 import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
@@ -27,7 +29,7 @@ export class BoardController {
   async get(@Param('id') id: string) {
     const board = await this.boardService.findBoardById(id);
     if (!board) {
-      throw new NotFoundException('Board not found!');
+      throw new NotFoundException(BOARD_NOT_FOUND);
     }
     return this.boardService.getBoardById(id);
   }
@@ -37,7 +39,7 @@ export class BoardController {
   async create(@Body() dto: CreateBoardDto) {
     const user = await this.userService.findUserById(dto.userId);
     if (!user) {
-      throw new BadRequestException('Board owner not found!');
+      throw new BadRequestException(USER_NOT_FOUND);
     }
     const newBoard = await this.boardService.createBoard(dto);
     const newUser = { ...user.toObject() };
@@ -60,14 +62,14 @@ export class BoardController {
   async delete(@Param('id') id: string) {
     const boardData = await this.boardService.findBoardById(id);
     if (!boardData) {
-      throw new NotFoundException('Board  not found!');
+      throw new NotFoundException(BOARD_NOT_FOUND);
     }
 
     const boardOwner = await this.userService.findUserById(
       boardData.toObject().userId,
     );
     if (!boardOwner) {
-      throw new BadRequestException('Board owner not found!');
+      throw new BadRequestException(USER_NOT_FOUND);
     }
 
     const newUser = { ...boardOwner.toObject() };
