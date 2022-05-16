@@ -43,5 +43,3 @@ lerna-debug.log*
 /mongo
 
 /mongo-data-4.4
-
-docker-compose.yml
