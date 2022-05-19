@@ -15,7 +15,7 @@ export class FilesService {
 
   async saveFile(file: Express.Multer.File): Promise<DocumentType<FileModel>> {
     const dateString = dateFns.format(new Date(), 'MM-dd-yyyy');
-    const uploadFolder = process.env.IMAGES_PATH + `/uploads/${dateString}`;
+    const uploadFolder = process.env.IMAGES_PATH + `/${dateString}`;
 
     await ensureDir(uploadFolder);
 
