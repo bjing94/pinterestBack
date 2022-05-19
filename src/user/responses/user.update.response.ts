@@ -1,0 +1,3 @@
+class UserUpdateResponse {
+  msg: string;
+}

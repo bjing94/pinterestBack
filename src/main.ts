@@ -35,7 +35,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.enableCors({
-    origin: ['http://localhost:3001'], //your front url,
+    origin: ['http://ivan-dev.ru:80'], //your front url,
     methods: ['POST', 'GET', 'DELETE', 'PATCH'],
     credentials: true,
   });

@@ -34,6 +34,7 @@ import {
 } from './constants/pin.constants';
 import { CreatePinDto } from './dto/create-pin.dto';
 import { FindPinDto } from './dto/find-pin.dto';
+import { UserIsPinOwnerGuard } from './guards/user-is-pin-owner.guard';
 import { PinService } from './pin.service';
 
 @Controller('pin')
@@ -83,7 +84,7 @@ export class PinController {
     return createdPin;
   }
 
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, UserIsPinOwnerGuard)
   @Delete(':id')
   async delete(
     @Param('id', MongoIdValidationPipe) id: string,
@@ -131,7 +132,7 @@ export class PinController {
     return this.pinService.deletePinById(id);
   }
 
-  @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard, UserIsPinOwnerGuard)
   @Patch(':id')
   async patch(
     @Param('id', MongoIdValidationPipe) id: string,

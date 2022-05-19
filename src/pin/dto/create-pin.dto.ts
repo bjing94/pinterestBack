@@ -6,9 +6,6 @@ export class CreatePinDto {
   title: string;
 
   @IsString()
-  username: string;
-
-  @IsString()
   userId: string;
 
   @IsString()

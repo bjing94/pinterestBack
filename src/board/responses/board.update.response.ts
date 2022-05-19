@@ -1,0 +1,3 @@
+class BoardUpdateResponse {
+  msg: string;
+}

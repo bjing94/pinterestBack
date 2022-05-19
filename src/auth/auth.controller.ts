@@ -81,10 +81,4 @@ export class AuthController {
     }
     return currentUser;
   }
-
-  @Delete('clear')
-  async clearUsers() {
-    await this.userService.deleteAllUsers();
-    return 'cleared';
-  }
 }

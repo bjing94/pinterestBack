@@ -71,6 +71,12 @@ export class UserService {
   }
 
   async updateUserById(id: string, dto: UpdateUserDto) {
+    if (!dto.newPassword) {
+      return this.userModel
+        .findByIdAndUpdate(id, { ...dto }, { new: true })
+        .exec();
+    }
+
     const salt = await genSalt(7);
     const hashedPassword = await hash(dto.newPassword, salt);
     const { newPassword, ...rest } = dto;

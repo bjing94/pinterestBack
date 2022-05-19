@@ -6,12 +6,8 @@ export class PinModel extends TimeStamps {
   @prop()
   title: string;
 
-  // image id in our folder
   @prop()
   imgId: string;
-
-  @prop()
-  username: string;
 
   @prop()
   userId: string; // mongodb id
