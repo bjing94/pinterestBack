@@ -1,4 +1,4 @@
-export const USER_NOT_FOUND = "User with this email doesn't exist!";
+export const USER_NOT_FOUND = 'User not found!';
 export const USER_WRONG_DATA = 'User data is incorrect!';
 export const USER_WRONG_PASSWORD = 'Wrong password!';
 export const USER_CANNOT_SUBSCRIBE = 'Cannot subscribe to yourself!';

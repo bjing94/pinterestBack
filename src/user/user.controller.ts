@@ -36,16 +36,17 @@ export class UserController {
 
   @HttpCode(200)
   @Get(':id')
-  async getUserById(@Param('id') _id: string): Promise<UserDataResponse> {
-    console.log('User id:', _id);
-    const user = await this.userService.findUserById(_id);
+  async getUserByDisplayId(@Param('id') id: string): Promise<UserDataResponse> {
+    console.log('User Id:', id);
+    const user = await this.userService.findUserById(id);
     if (!user) {
       throw new NotFoundException(USER_NOT_FOUND);
     }
 
     const {
-      username,
+      _id,
       displayId,
+      username,
       avatarSrc,
       description,
       subscribers,
@@ -55,8 +56,11 @@ export class UserController {
       savedPins,
       createdAt,
     } = user;
+
+    const userId = _id.toString();
+
     return {
-      _id,
+      _id: userId,
       username,
       displayId,
       avatarSrc,
@@ -140,7 +144,7 @@ export class UserController {
     } = userFound;
 
     const userId = _id.toString();
-
+    console.log(userFound);
     return {
       _id: userId,
       username,
