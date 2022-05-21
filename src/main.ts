@@ -36,7 +36,7 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [process.env.FRONT_URL || 'http://ivan-dev.ru:80'], //your front url,
-    methods: ['POST', 'GET', 'DELETE', 'PATCH'],
+    methods: ['POST', 'GET', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'PUT'],
     credentials: true,
   });
 
