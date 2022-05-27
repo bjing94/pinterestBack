@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import * as session from 'express-session';
 import * as passport from 'passport';
+import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
 const MongoStore = require('connect-mongo');
-// const MongoDBStore = require('connect-mongodb-session')(session);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -30,6 +30,8 @@ async function bootstrap() {
       store: sessionStore,
     }),
   );
+
+  app.use(bodyParser.json({ limit: '5mb' }));
 
   app.use(passport.initialize());
   app.use(passport.session());

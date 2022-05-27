@@ -20,6 +20,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UserIsUserGuard } from './guards/is-user.guard';
 import { UserDataResponse } from './responses/user.data.response';
 import {
+  USER_ALREADY_SUBSCRIBED,
   USER_CANNOT_SUBSCRIBE,
   USER_NOT_FOUND,
   USER_SUBSCRIBER_NOT_FOUND,
@@ -97,6 +98,9 @@ export class UserController {
     if (!subscription) {
       throw new NotFoundException(USER_SUBSCRIBTION_NOT_FOUND);
     }
+    if (subscription.subscribers.includes(subscriberId)) {
+      throw new BadRequestException(USER_ALREADY_SUBSCRIBED);
+    }
     const subscriberObj = subscriber.toObject();
     subscriberObj.subscriptions.push(subscriptionId);
     const updatedSubscriber = await this.userService.updateUserById(
@@ -106,6 +110,60 @@ export class UserController {
 
     const subscriptionObj = subscription.toObject();
     subscriptionObj.subscribers.push(subscriberId);
+    const updatedSubscribtioner = await this.userService.updateUserById(
+      subscriptionId,
+      subscriptionObj,
+    );
+
+    if (!updatedSubscriber || !updatedSubscribtioner) {
+      return {
+        msg: USER_UPDATE_FAILED,
+      };
+    }
+    return {
+      msg: USER_UPDATED,
+    };
+  }
+
+  @HttpCode(200)
+  @UseGuards(AuthenticatedGuard)
+  @Post('unsubscribe/:id')
+  async unsubscribe(
+    @Param('id') _id: string,
+    @Req() req: Express.Request,
+  ): Promise<UserUpdateResponse> {
+    const subscriptionId = (await this.userService.findUserById(_id))
+      .toObject()
+      ._id.toString();
+    const subscriberId = req.user['_id'];
+
+    if (subscriberId == subscriptionId) {
+      throw new BadRequestException(USER_CANNOT_SUBSCRIBE);
+    }
+    const subscriber = await this.userService.findUserById(subscriberId);
+    if (!subscriber) {
+      throw new NotFoundException(USER_SUBSCRIBER_NOT_FOUND);
+    }
+    const subscription = await this.userService.findUserById(subscriptionId);
+    if (!subscription) {
+      throw new NotFoundException(USER_SUBSCRIBTION_NOT_FOUND);
+    }
+    if (!subscription.subscribers.includes(subscriberId)) {
+      throw new BadRequestException(USER_ALREADY_SUBSCRIBED);
+    }
+    const subscriberObj = subscriber.toObject();
+    subscriberObj.subscriptions = subscriberObj.subscriptions.filter(
+      (id) => id !== subscriptionId,
+    );
+    const updatedSubscriber = await this.userService.updateUserById(
+      subscriberId,
+      subscriberObj,
+    );
+
+    const subscriptionObj = subscription.toObject();
+    subscriptionObj.subscribers = subscriptionObj.subscribers.filter(
+      (id) => id !== subscriberId,
+    );
     const updatedSubscribtioner = await this.userService.updateUserById(
       subscriptionId,
       subscriptionObj,

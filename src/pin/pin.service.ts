@@ -3,6 +3,7 @@ import { ModelType } from '@typegoose/typegoose/lib/types';
 import { InjectModel } from 'nestjs-typegoose';
 import { CreatePinDto } from './dto/create-pin.dto';
 import { FindPinDto } from './dto/find-pin.dto';
+import { UpdatePinDto } from './dto/update-pin.dto';
 import { PinModel } from './pin.model';
 
 @Injectable()
@@ -31,7 +32,7 @@ export class PinService {
     return this.pinModel.findByIdAndDelete(id).exec();
   }
 
-  async updatePinById(id: string, dto: CreatePinDto) {
+  async updatePinById(id: string, dto: UpdatePinDto) {
     return this.pinModel.findByIdAndUpdate(id, dto, { new: true }).exec();
   }
 }

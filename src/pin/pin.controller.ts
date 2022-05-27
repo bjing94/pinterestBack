@@ -3,7 +3,9 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
+  HttpCode,
   NotFoundException,
   Param,
   Patch,
@@ -34,6 +36,7 @@ import {
 } from './constants/pin.constants';
 import { CreatePinDto } from './dto/create-pin.dto';
 import { FindPinDto } from './dto/find-pin.dto';
+import { UpdatePinDto } from './dto/update-pin.dto';
 import { UserIsPinOwnerGuard } from './guards/user-is-pin-owner.guard';
 import { PinService } from './pin.service';
 
@@ -132,14 +135,32 @@ export class PinController {
     return this.pinService.deletePinById(id);
   }
 
-  @UseGuards(AuthenticatedGuard, UserIsPinOwnerGuard)
+  @UseGuards(AuthenticatedGuard)
   @Patch(':id')
   async patch(
     @Param('id', MongoIdValidationPipe) id: string,
-    @Body() dto: CreatePinDto,
+    @Body() dto: UpdatePinDto,
+    @Req() req: Express.Request,
   ) {
-    const pin = await this.pinService.updatePinById(id, dto);
-    if (!pin) {
+    // If updating only comments
+    if (Object.keys(dto).length === 1 && dto.comments !== undefined) {
+      const pin = await this.pinService.updatePinById(id, dto);
+      if (!pin) {
+        throw new NotFoundException(PIN_NOT_FOUND);
+      }
+      return pin;
+    }
+
+    // check if he is the owner
+    const userId = req.user['_id'];
+
+    const pin = await this.pinService.findPinById(id);
+    if (!pin || userId !== pin.userId) {
+      throw new ForbiddenException(PIN_PERMISSION_DENIED);
+    }
+
+    const updatedPin = await this.pinService.updatePinById(id, dto);
+    if (!updatedPin) {
       throw new NotFoundException(PIN_NOT_FOUND);
     }
     return pin;
