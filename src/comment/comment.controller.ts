@@ -8,6 +8,7 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -21,6 +22,7 @@ import {
 import { CommentService } from './comment.service';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { UserIsCommentOwnerGuard } from './guards/user-is-comment-owner.guard';
 
 @Controller('comment')
 export class CommentController {
@@ -47,6 +49,7 @@ export class CommentController {
     return comment;
   }
 
+  @UseGuards(UserIsCommentOwnerGuard)
   @HttpCode(200)
   @Delete(':id')
   async deleteComment(@Param('id', MongoIdValidationPipe) _id: string) {
@@ -61,6 +64,7 @@ export class CommentController {
     };
   }
 
+  @UseGuards(UserIsCommentOwnerGuard)
   @HttpCode(200)
   @Patch(':id')
   async updateComment(

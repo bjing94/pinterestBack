@@ -32,14 +32,6 @@ export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(ApiKeyMiddleware)
-      .forRoutes(
-        '/user',
-        '/pin',
-        '/board',
-        '/search',
-        '/comment',
-        '/auth',
-        '/files',
-      );
+      .forRoutes('/user', '/pin', '/board', '/search', '/comment', '/auth');
   }
 }
