@@ -35,6 +35,7 @@ export class CommentController {
     if (!comment) {
       throw new BadRequestException(COMMENT_NOT_FOUND);
     }
+    console.log('Returning comment requested:', comment);
     return comment;
   }
 
