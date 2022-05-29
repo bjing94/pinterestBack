@@ -3,11 +3,13 @@ import {
   Body,
   Controller,
   Delete,
+  ForbiddenException,
   Get,
   HttpCode,
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -17,6 +19,7 @@ import {
   COMMENT_DELETED,
   COMMENT_NOT_CREATED,
   COMMENT_NOT_FOUND,
+  COMMENT_PERMISSION_DENIED,
   COMMENT_UPDATED,
 } from './comment.constants';
 import { CommentService } from './comment.service';
@@ -71,9 +74,35 @@ export class CommentController {
   async updateComment(
     @Param('id', MongoIdValidationPipe) _id: string,
     @Body() dto: UpdateCommentDto,
+    @Req() req: Express.Request,
   ) {
-    const comment = await this.commentService.updateCommentById(_id, dto);
-    if (!comment) {
+    if (Object.keys(dto).length === 1 && dto.likedBy !== undefined) {
+      const comment = await this.commentService.updateCommentById(_id, dto);
+      if (!comment) {
+        throw new BadRequestException(COMMENT_NOT_FOUND);
+      }
+      return comment;
+    }
+    if (Object.keys(dto).length === 1 && dto.usefulBy !== undefined) {
+      const comment = await this.commentService.updateCommentById(_id, dto);
+      if (!comment) {
+        throw new BadRequestException(COMMENT_NOT_FOUND);
+      }
+      return comment;
+    }
+    // check if he is the owner
+    const userId = req.user['_id'];
+
+    const comment = await this.commentService.findCommentById(_id);
+    if (!comment || userId !== comment.userId) {
+      throw new ForbiddenException(COMMENT_PERMISSION_DENIED);
+    }
+
+    const updatedComment = await this.commentService.updateCommentById(
+      _id,
+      dto,
+    );
+    if (!updatedComment) {
       throw new BadRequestException(COMMENT_NOT_FOUND);
     }
 
