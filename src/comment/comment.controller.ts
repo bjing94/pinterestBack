@@ -75,6 +75,7 @@ export class CommentController {
     @Body() dto: UpdateCommentDto,
     @Req() req: Express.Request,
   ) {
+    console.log('Updating comment:', _id, dto);
     if (Object.keys(dto).length === 1 && dto.likedBy !== undefined) {
       const comment = await this.commentService.updateCommentById(_id, dto);
       if (!comment) {
