@@ -38,7 +38,6 @@ export class UserController {
   @HttpCode(200)
   @Get(':id')
   async getUserByDisplayId(@Param('id') id: string): Promise<UserDataResponse> {
-    console.log('User Id:', id);
     const user = await this.userService.findUserById(id);
     if (!user) {
       throw new NotFoundException(USER_NOT_FOUND);

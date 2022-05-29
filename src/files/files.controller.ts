@@ -12,11 +12,11 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { path } from 'app-root-path';
 import { createReadStream } from 'fs';
 import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
 import { FILE_NOT_DEFINED, FILE_NOT_FOUND } from './files.constants';
 import { FilesService } from './files.service';
+import { ruToEng } from 'src/helpers/translit';
 
 @Controller('files')
 export class FilesController {
@@ -42,11 +42,17 @@ export class FilesController {
       throw new NotFoundException(FILE_NOT_FOUND);
     }
 
-    const fileStream = createReadStream(`${path}/uploads/${fileInfo.url}`);
-    res.setHeader(
-      'Content-Disposition',
-      `attachment; filename=${fileInfo.fileName}`,
+    const fileStream = createReadStream(
+      `${process.env.IMAGES_PATH}${fileInfo.url}`,
     );
+
+    const latinName = ruToEng(fileInfo.fileName);
+    console.log(
+      'Downloading file: ',
+      `${process.env.IMAGES_PATH}${fileInfo.url}`,
+      fileInfo.fileName,
+    );
+    res.setHeader('Content-Disposition', `attachment; filename=${latinName}`);
 
     fileStream.pipe(res);
   }

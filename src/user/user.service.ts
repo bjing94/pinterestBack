@@ -40,7 +40,7 @@ export class UserService {
       displayId: dto.displayId,
       email: dto.email,
       passwordHash: hashedPassword,
-      avatarSrc: '6257b22712aca3a9af63cf94', //placeholder avatar
+      avatarSrc: '', //placeholder avatar
       createdPins: [],
       savedPins: [], // profile pins
       boards: [],

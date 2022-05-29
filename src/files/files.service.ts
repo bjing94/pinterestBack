@@ -6,6 +6,7 @@ import { InjectModel } from 'nestjs-typegoose';
 import { FileModel } from './file.model';
 import { ModelType, DocumentType } from '@typegoose/typegoose/lib/types';
 import { fstat } from 'fs';
+import { ruToEng } from 'src/helpers/translit';
 
 @Injectable()
 export class FilesService {
@@ -16,16 +17,16 @@ export class FilesService {
   async saveFile(file: Express.Multer.File): Promise<DocumentType<FileModel>> {
     const dateString = dateFns.format(new Date(), 'MM-dd-yyyy');
     const uploadFolder = process.env.IMAGES_PATH + `/${dateString}`;
-
+    const latinName = ruToEng(file.originalname);
     await ensureDir(uploadFolder);
 
-    await writeFile(`${uploadFolder}/${file.originalname}`, file.buffer);
+    await writeFile(`${uploadFolder}/${latinName}`, file.buffer);
 
     //Then add file info to DB
 
     return this.fileModel.create({
-      fileName: file.originalname,
-      url: `${dateString}/${file.originalname}`,
+      fileName: latinName,
+      url: `${dateString}/${latinName}`,
     });
   }
 
