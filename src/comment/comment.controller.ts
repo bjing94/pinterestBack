@@ -68,7 +68,6 @@ export class CommentController {
     };
   }
 
-  @UseGuards(UserIsCommentOwnerGuard)
   @HttpCode(200)
   @Patch(':id')
   async updateComment(
