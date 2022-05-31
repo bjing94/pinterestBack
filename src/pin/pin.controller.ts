@@ -70,7 +70,7 @@ export class PinController {
       throw new BadRequestException(PIN_LIMIT_EXCEED);
     }
 
-    const board = await this.boardService.getBoardById(dto.boardId);
+    const board = await this.boardService.findBoardById(dto.boardId);
     if (!board) {
       throw new BadRequestException(BOARD_NOT_FOUND);
     }

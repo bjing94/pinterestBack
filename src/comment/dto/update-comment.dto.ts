@@ -1,7 +1,15 @@
+import { IsOptional, IsString } from 'class-validator';
+
 export class UpdateCommentDto {
-  content: string;
+  @IsString()
+  @IsOptional()
+  content?: string;
 
-  likedBy: string[];
+  @IsString({ each: true })
+  @IsOptional()
+  likedBy?: string[];
 
-  usefulBy: string[];
+  @IsString({ each: true })
+  @IsOptional()
+  usefulBy?: string[];
 }

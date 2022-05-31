@@ -11,10 +11,6 @@ export class BoardService {
     @InjectModel(BoardModel) private readonly boardModel: ModelType<BoardModel>,
   ) {}
 
-  async getBoardById(id: string) {
-    return this.boardModel.findById(id).exec();
-  }
-
   async createBoard(dto: CreateBoardDto) {
     return this.boardModel.create(dto);
   }

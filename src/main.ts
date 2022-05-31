@@ -41,10 +41,7 @@ async function bootstrap() {
     methods: ['POST', 'GET', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'PUT'],
     credentials: true,
   });
-  app.enableCors({
-    origin: ['*'],
-    methods: ['OPTIONS'],
-  });
+
   await app.listen(3000);
 }
 bootstrap();
