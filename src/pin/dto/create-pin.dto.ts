@@ -8,8 +8,9 @@ export class CreatePinDto {
   @IsString()
   userId: string;
 
+  @IsOptional()
   @IsString()
-  boardId: string;
+  boardId?: string;
 
   @IsString()
   imgId: string;

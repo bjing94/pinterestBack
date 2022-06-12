@@ -10,11 +10,8 @@ import {
   Param,
   Patch,
   Post,
-  Query,
   Req,
-  UploadedFile,
   UseGuards,
-  UseInterceptors,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -22,7 +19,6 @@ import { AuthenticatedGuard } from 'src/auth/guards/authenticated.guard';
 import { BOARD_NOT_FOUND } from 'src/board/board.constants';
 import { BoardService } from 'src/board/board.service';
 import { CreateBoardDto } from 'src/board/dto/create-board.dto';
-import { FilesService } from 'src/files/files.service';
 import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
 import { UpdateUserDto } from 'src/user/dto/update-user.dto';
 import { USER_NOT_FOUND } from 'src/user/user.constants';
@@ -69,21 +65,30 @@ export class PinController {
     if (user.toObject().createdPins.length >= PIN_LIMIT) {
       throw new BadRequestException(PIN_LIMIT_EXCEED);
     }
-
-    const board = await this.boardService.findBoardById(dto.boardId);
-    if (!board) {
-      throw new BadRequestException(BOARD_NOT_FOUND);
+    let board = undefined;
+    if (dto.boardId) {
+      board = await this.boardService.findBoardById(dto.boardId);
+      if (!board) {
+        throw new BadRequestException(BOARD_NOT_FOUND);
+      }
     }
-    const createdPin = await this.pinService.createPin(dto);
+    const { boardId, ...rest } = dto;
+    const createdPin = await this.pinService.createPin(rest);
 
     const newUserDto = user.toObject() as UpdateUserDto;
     newUserDto.createdPins.push(createdPin._id.toString());
+
+    if (dto.boardId && board) {
+      console.log('PIN: saving to board', boardId);
+      const newBoardDto = board.toObject() as CreateBoardDto;
+      newBoardDto.pins.push(createdPin._id.toString());
+      await this.boardService.updateBoardById(dto.boardId, newBoardDto);
+    }
+    if (!dto.boardId) {
+      console.log('PIN: saving to profile');
+      newUserDto.savedPins.push(createdPin._id.toString());
+    }
     await this.userService.updateUserById(dto.userId, newUserDto);
-
-    const newBoardDto = board.toObject() as CreateBoardDto;
-    newBoardDto.pins.push(createdPin._id.toString());
-    await this.boardService.updateBoardById(dto.boardId, newBoardDto);
-
     return createdPin;
   }
 
