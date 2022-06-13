@@ -3,10 +3,19 @@ import * as session from 'express-session';
 import * as passport from 'passport';
 import * as bodyParser from 'body-parser';
 import { AppModule } from './app.module';
+import { readFileSync } from 'fs';
 const MongoStore = require('connect-mongo');
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: readFileSync(process.env.KEY_PATH),
+    cert: readFileSync(process.env.CERT_PATH),
+  };
+
+  const app = await NestFactory.create(
+    AppModule,
+    process.env.PRODUCTION ? { httpsOptions } : {},
+  );
   const sessionStore = MongoStore.create({
     mongoUrl:
       'mongodb://' +
@@ -37,7 +46,7 @@ async function bootstrap() {
   app.use(passport.session());
 
   app.enableCors({
-    origin: [process.env.FRONT_URL || 'http://ivan-dev.ru:80'], //your front url,
+    origin: [process.env.FRONT_URL || 'https://ivan-dev.ru:80'], //your front url,
     methods: ['POST', 'GET', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD', 'PUT'],
     credentials: true,
   });
