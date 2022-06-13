@@ -14,7 +14,11 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createReadStream } from 'fs';
 import { MongoIdValidationPipe } from 'src/pipes/mongo-id-validation.pipe';
-import { FILE_NOT_DEFINED, FILE_NOT_FOUND } from './files.constants';
+import {
+  FILE_NOT_DEFINED,
+  FILE_NOT_FOUND,
+  FILE_WRONG_FORMAT,
+} from './files.constants';
 import { FilesService } from './files.service';
 import { ruToEng } from 'src/helpers/translit';
 
@@ -29,6 +33,10 @@ export class FilesController {
     @UploadedFile() file: Express.Multer.File,
     @Body() additionaInfo,
   ) {
+    const allowedTypes = ['image/jpeg', 'image/png'];
+    if (!allowedTypes.includes(file.mimetype)) {
+      throw new BadRequestException(FILE_WRONG_FORMAT);
+    }
     if (!file) {
       throw new BadRequestException(FILE_NOT_DEFINED);
     }
