@@ -27,11 +27,12 @@ export class SearchController {
     @Query('q') queryStr: string,
     @Query('random', ParseBoolPipe) isRandom: boolean,
   ) {
+    console.log('Handling search:', { title: queryStr, isRandom });
     const pins = await this.pinService.findPin({
       title: queryStr,
       random: isRandom,
     });
-
+    console.log('Pins found', pins);
     if (!pins.length) {
       throw new NotFoundException(PIN_NOT_FOUND);
     }

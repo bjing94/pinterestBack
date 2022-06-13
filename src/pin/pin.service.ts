@@ -24,7 +24,8 @@ export class PinService {
     if (random) {
       return this.pinModel.find().exec();
     } else {
-      return this.pinModel.find({ title }).exec();
+      const titleRegEx = new RegExp(title, 'i');
+      return this.pinModel.find({ title: { $regex: titleRegEx } }).exec();
     }
   }
 
